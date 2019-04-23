@@ -1,100 +1,358 @@
 import React from 'react';
-import { View, ImageBackground, StyleSheet, ScrollView,Text } from 'react-native';
-import Category from './aerochallenge/Category';
+import {ScrollView, Text, View, StyleSheet, TextInput, Dimensions} from 'react-native';
+import AwesomeButton from "react-native-really-awesome-button";
+import SwitchSelector from "react-native-switch-selector";
+import {Button} from "react-native-elements"
+
+const {width, height} = Dimensions.get('window')
 
 export default class Voting extends React.Component {
-
-  state = {
-        categories: [
-            {'name': 'StartChrono'},
-            {'name': 'ColonesCarthaginoises'},
-            {'name': 'GrandeMosquee'},
-            {'name': 'BassinsAghlabides'},
-            {'name': 'MurailleDeSfax'},
-            {'name': 'HotelAfrica'},
-            {'name': 'Arrivee'}
-          ],
-          points: 0,
-          buttons: [
-            [ 'error', 'error', 'error' ],
-            [ 'error', 'error' ],
-            [ 'error', 'error', 'error' ],
-            [ 'error', 'error', 'error', 'error' ],
-            [ 'error',  'error' ],
-            [ 'error' ],
-            [ 'error' ]
-          ],
-          test: null
-     }
+    static navigationOptions = {
+        title: 'Comptage des points',
+    };
 
 
+    constructor(props, context) {
+        super(props, context);
 
-  _add100Handler = ( type, i, cptp, cptm) => {
-    console.log('old'+this.state.points);
-    if(this.state.buttons[type][i] === 'error'){
-      let oldpoints = this.state.points;
-      console.log('oldpoints'+this.state.points);
-      let updatedpoints = oldpoints + cptp;
-      this.setState({points: updatedpoints});
-      console.log('new'+this.state.points);
-      const newButton = { ...this.state.buttons };
-      newButton[type][i] = 'success';
-      this.setState({buttons: newButton});
-      const aaa = this.state.buttons[type][i]
-      this.setState({test: aaa});
-          }
-          else {
-            let oldpoints = this.state.points;
-            console.log('oldpoints'+this.state.points);
-            let updatedpoints = oldpoints - cptm;
-            this.setState({points: updatedpoints});
-            console.log('new'+this.state.points);
-            const newButton = { ...this.state.buttons };
-            newButton[type][i] = 'error';
-            this.setState({buttons: newButton});
-          }
-      }
+        this.state = {
+            droneFabriquee: 0,
+            posterTechnique: 0,
+            quitterZoneDepart: 0,
+            passerColonnes: 0,
+            toursMosque: 0,
+            stab11: 0,
+            stab12: 0,
+            stab21: 0,
+            stab22: 0,
+            portail: 0,
+            durée: 0,
+            collisions: 0
+        }
+        console.log(this.props.id);
+    }
 
 
 
+    render() {
+      this.params = this.props.navigation.state.params;
+      console.log(this.params);
+        return (
+          <View >
+            <View 
+            height={100}
+            width={100}
+            position="absolute"
+            style={{alignSelf: 'flex-end',zindex:5}}
+            >
+                        <AwesomeButton style={{marginRight: 2}}
+                                       height={100}
+                                       width={100}
+                                       borderRadius={50}
+                                       backgroundColor={'#FFA500'}
+                                       progress
+                                       progressLoadingTime={1000}
+                                       onPress={ next => {
+                                         
+                                        this.setState(prev => {
+                                            return { collisions:prev.collisions+1}
+                                        })
+                                      console.log(this.state.collisions)
+                                      this.forceUpdate();
+                                      next();
+                                       }
+                                      }
+                        >
+                            {this.state.collisions+' Collision ' }
+                        </AwesomeButton>
+                        <AwesomeButton style={{
+                            marginLeft: 2,
+                            position: 'absolute',
+                            right: 0,
+                            bottom: 0
+                        }}
+                                       height={38}
+                                       width={38}
+                                       borderRadius={20}
+                                       raiseLevel={0}
+                                       backgroundColor={"#C82333"}
+                                       onPress={next => {
+                                           /** Do Something **/
+                                           this.setState(prevState => {
+                                               if (prevState.collisions > 0)
+                                                   prevState.collisions--
+                                           });
+                                           this.forceUpdate();
+                                           next();
+                                       }}
+                        >
+                            -
+                        </AwesomeButton>
+                        
+                    </View>
 
-  render() {
-    return (
-    <View style={{
-        flex: 1,
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-      }}>
-      <View style={{ height: 40, backgroundColor: '#EA4C89', marginBottom: 10,alignItems: 'center', justifyContent: 'center'}} >
+            <ScrollView 
+            style={[{
+            marginRight: 10,
+            marginLeft: 10,
+            }]}
+            >
+              {/*---------------------------------------*/}
+              <View style={[{marginTop: 20}]}>
+                    <AwesomeButton style={{marginRight: 2}}
+                                       borderRadius={7}
+                                       backgroundColor={this.state.droneFabriquee==100?'rgba(255, 165, 0, 0.5)':'rgba(255, 165, 0, 1)'}
+                                       width={width*65/100}
+                                       progress
+                                       onPress={next => {
+                                           /** Do Something **/
+                                           this.setState(prevState => {
+                                                   prevState.droneFabriquee= (prevState.droneFabriquee==100)?0:100
+                                           });
+                                           this.forceUpdate();
+                                           next();
+                                       }}
+                        >
+                            {"Drone fabriquée par le participant"}
+                        </AwesomeButton>
+                </View>
+                <View style={[{marginTop: 20}]}>
+                    <AwesomeButton style={{marginRight: 2}}
+                                       borderRadius={7}
+                                       width={width*65/100}
+                                       backgroundColor={this.state.posterTechnique==10?'rgba(255, 165, 0, 0.5)':'rgba(255, 165, 0, 1)'}
+                                       progress
+                                       onPress={next => {
+                                           /** Do Something **/
+                                           this.setState(prevState => {
+                                            prevState.posterTechnique= (prevState.posterTechnique==10)?0:10
+                                           });
+                                           this.forceUpdate();
+                                           next();
+                                       }}
+                        >
+                            {"poster Technique"}
+                        </AwesomeButton>
+                </View>
 
-          <Text style={{ color: "#ffffff", fontWeight: 'bold', fontSize: 20, fontFamily: 'sans-serif-condensed' }} >this.props.id</Text>
-      </View>
-      <ScrollView>
-      {this.state.categories.map(order => (
-        <View key={order.name}>
-        <View style={{ height: 40, backgroundColor: '#5BC0DE',borderRadius: 20 ,marginBottom: 10,alignItems: 'center', justifyContent: 'center'}} >
-        <Text style={{ color: "#ffffff", fontWeight: 'bold', fontSize: 20, fontFamily: 'sans-serif-condensed' }} >{order.name}</Text>
-        </View>
-        <Category type={order.name} hand={this._add100Handler} tab={this.state.buttons} test={this.state.points}/>
-        </View>
-                ))}
-          </ScrollView>
-          <Text>{this.state.points}</Text>
-    </View>
-    );
-  }
+                <View style={[{marginTop: 20}]}>
+                    <AwesomeButton style={{marginRight: 2}}
+                                       borderRadius={7}
+                                       width={width*65/100}
+                                       backgroundColor={this.state.quitterZoneDepart==5?'rgba(255, 165, 0, 0.5)':'rgba(255, 165, 0, 1)'}
+                                       progress
+                                       onPress={next => {
+                                           /** Do Something **/
+                                           this.setState(prevState => {
+                                            prevState.quitterZoneDepart= (prevState.quitterZoneDepart==5)?0:5
+                                           });
+                                           this.forceUpdate();
+                                           next();
+                                       }}
+                        >
+                            {"quitter la zone départ"}
+                        </AwesomeButton>
+                </View>
+
+              {/*---------------------------------------*/}
+
+              <Text>Les colonnes Cartagineoises</Text>
+                <View style={[{marginTop: 20}]}>
+                    <AwesomeButton style={{marginRight: 2}}
+                                       borderRadius={7}
+                                       width={width*65/100}
+                                       backgroundColor={this.state.passerColonnes==2?'rgba(255, 165, 0, 0.5)':'rgba(255, 165, 0, 1)'}
+                                       progress
+                                       onPress={next => {
+                                           /** Do Something **/
+                                           this.setState(prevState => {
+                                            (prevState.passerColonnes==2)?prevState.passerColonnes = 0:prevState.passerColonnes = 2
+                                          });
+                                           this.forceUpdate();
+                                           next();
+                                       }}
+                        >
+                            {"passer entre deux colonnes"}
+                        </AwesomeButton>
+                </View>
+                <View style={[{marginTop: 20}]}>
+                    <AwesomeButton style={{marginRight: 2}}
+                                       borderRadius={7}
+                                       width={width*65/100}
+                                       backgroundColor={this.state.passerColonnes==3?'rgba(255, 165, 0, 0.5)':'rgba(255, 165, 0, 1)'}
+                                       progress
+                                       onPress={next => {
+                                           /** Do Something **/
+                                           this.setState(prevState => {
+                                             (prevState.passerColonnes==3)?prevState.passerColonnes = 0:prevState.passerColonnes = 3
+                                    });
+                                           this.forceUpdate();
+                                           next();
+                                       }}
+                        >
+                            {"passer entre trois colonnes"}
+                        </AwesomeButton>
+                </View>
+
+                {/*---------------------------------------*/}
+                <Text>Minaret de la grande mosquée Okba Ibn Nafi</Text>
+                <View style={[{marginTop: 20}]}>
+                    <AwesomeButton style={{marginRight: 2}}
+                                       borderRadius={7}
+                                       width={width*65/100}
+                                       backgroundColor={this.state.toursMosque==1?'rgba(255, 165, 0, 0.5)':'rgba(255, 165, 0, 1)'}
+                                       progress
+                                       onPress={next => {
+                                           /** Do Something **/
+                                           this.setState(prevState => {
+                                            (prevState.toursMosque==1)?prevState.toursMosque = 0:prevState.toursMosque = 1
+                                           });
+                                           this.forceUpdate();
+                                           next();
+                                       }}
+                        >
+                            {"effectuer un tour"}
+                        </AwesomeButton>
+                </View>
+                <View style={[{marginTop: 20}]}>
+                    <AwesomeButton style={{marginRight: 2}}
+                                       borderRadius={7}
+                                       width={width*65/100}
+                                       backgroundColor={this.state.toursMosque==2?'rgba(255, 165, 0, 0.5)':'rgba(255, 165, 0, 1)'}
+                                       progress
+                                       onPress={next => {
+                                           /** Do Something **/
+                                           this.setState(prevState => {
+                                            (prevState.toursMosque==2)?prevState.toursMosque = 0:prevState.toursMosque = 2
+                                           });
+                                           this.forceUpdate();
+                                           next();
+                                       }}
+                        >
+                            {"effectuer deux tours"}
+                        </AwesomeButton>
+                </View>
+                <View style={[{marginTop: 20}]}>
+                    <AwesomeButton style={{marginRight: 2}}
+                                       borderRadius={7}
+                                       width={width*65/100}
+                                       backgroundColor={this.state.toursMosque==3?'rgba(255, 165, 0, 0.5)':'rgba(255, 165, 0, 1)'}
+                                       progress
+                                       onPress={next => {
+                                           /** Do Something **/
+                                           this.setState(prevState => {
+                                            (prevState.toursMosque==3)?prevState.toursMosque = 0:prevState.toursMosque = 3
+                                           });
+                                           this.forceUpdate();
+                                           next();
+                                       }}
+                        >
+                            {"effectuer trois tours"}
+                        </AwesomeButton>
+                </View>
+
+                {/*---------------------------------------*/}
+                <Text>Muraille de Sfax</Text>
+                <View style={[{marginTop: 20}]}>
+                    <AwesomeButton style={{marginRight: 2}}
+                                       borderRadius={7}
+                                       width={width*65/100}
+                                       backgroundColor={this.state.portail==50?'rgba(255, 165, 0, 0.5)':'rgba(255, 165, 0, 1)'}
+                                       progress
+                                       onPress={next => {
+                                           /** Do Something **/
+                                           this.setState(prevState => {
+                                            (prevState.portail==50)?prevState.portail = 0:prevState.portail = 50
+                                           });
+                                           this.forceUpdate();
+                                           next();
+                                       }}
+                        >
+                            {"Traverser le petit portail"}
+                        </AwesomeButton>
+                </View>
+                <View style={[{marginTop: 20}]}>
+                    <AwesomeButton style={{marginRight: 2}}
+                                       borderRadius={7}
+                                       width={width*65/100}
+                                       backgroundColor={this.state.portail==30?'rgba(255, 165, 0, 0.5)':'rgba(255, 165, 0, 1)'}
+                                       progress
+                                       onPress={next => {
+                                           /** Do Something **/
+                                           this.setState(prevState => {
+                                            (prevState.portail==30)?prevState.portail = 0:prevState.portail = 30
+                                           });
+                                           this.forceUpdate();
+                                           next();
+                                       }}
+                        >
+                            {"traverser le grand portail"}
+                        </AwesomeButton>
+                </View>
+
+                {/*---------------------------------------*/}
+
+                <View style={[{marginTop: 20}]}>
+                    <AwesomeButton style={{marginRight: 2}}
+                                       borderRadius={7}
+                                       width={width*65/100}
+                                       backgroundColor={'#FFA500'}
+                                       progress
+                                       onPress={next => {
+                                           /** Do Something **/
+                                           this.props.navigation.navigate('Result', {
+                                            scoreData: this.state,
+                                            id : this.params.id, 
+                                            name: this.params.name 
+                                            });
+                                           next();
+                                       }}
+                        >
+                            {"Arrivée Hotel Africa "}
+                        </AwesomeButton>
+                </View>
+
+                {/*---------------------------------------*/}
+
+              </ScrollView>
+ 
+          </View>
+
+            
+        );
+    }
 }
-
-const styles = StyleSheet.create ({
-   item: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      padding: 30,
-      margin: 2,
-      borderColor: '#2a4944',
-      borderWidth: 1,
-      backgroundColor: '#d2f7f1'
-   }
-})
-
+var styles = StyleSheet.create({
+    container: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+    },
+    sliders: {
+        margin: 20,
+        width: 280,
+    },
+    text: {
+        fontSize: 15,
+    },
+    title: {
+        fontSize: 30,
+    },
+    sliderOne: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+    },
+    buttonRow:
+        {
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignItems: 'center',
+            alignContent: 'flex-start',
+            marginTop: 20
+        },
+    flexEnd:
+        {
+            flexDirection: 'row',
+            justifyContent: 'flex-end',
+            alignItems: 'center',
+        },
+});
