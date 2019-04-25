@@ -3,6 +3,7 @@ import { View, StyleSheet, ImageBackground} from 'react-native';
 import { Text, Button } from 'galio-framework'
  
 class Home extends React.Component {
+ 
   render() {
     return (
         <View style={styles.container}>

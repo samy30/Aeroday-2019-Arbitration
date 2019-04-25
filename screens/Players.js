@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, ScrollView, Button, View, StyleSheet, BackHandler } from 'react-native';
+import { Text, ScrollView, View, StyleSheet, BackHandler } from 'react-native';
 import { db } from "../config";
 import AerochallengePlayer from '../components/AerochallengePLayer.js';
 import { withNavigation } from 'react-navigation';
@@ -52,6 +52,7 @@ class Players extends React.Component {
         var ls = (this.state.isLoading) ? <Loading_Component/> : null ;
         return (
             <ScrollView>
+                    
             <View style={styles.container}>
                 {ls}
                 {!this.state.valueArray.isEmpty  ? (

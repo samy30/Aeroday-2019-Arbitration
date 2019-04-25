@@ -12,7 +12,17 @@ import AerochallengeNavigator from './AeroChallengeNavigator'
 });
 */
 export default createStackNavigator({
-  Home: Home,
+  Home: {
+    screen: Home,
+    navigationOptions: () => ({
+      header: null,
+    }),
+  },
   Players: Players,
-  Aerochallenge: AerochallengeNavigator,
+  Aerochallenge: {
+    screen: AerochallengeNavigator,
+    navigationOptions: ({navigation}) => ({
+      title: navigation.state.params.name,
+    }),
+  },
 });

@@ -4,7 +4,7 @@ import {DataTable} from "react-native-paper";
 import AwesomeButton from "react-native-really-awesome-button";
 import { db } from "../config";
 
-
+let ref = db.ref("/players/");
 
 export default class Result extends React.Component {
     static navigationOptions = {
@@ -14,6 +14,7 @@ export default class Result extends React.Component {
 
     constructor(props, context) {
         super(props, context);
+    
     }
 
 
@@ -30,8 +31,8 @@ export default class Result extends React.Component {
 
     render() {
         this.params = this.props.navigation.state.params;
-
-        if (typeof this.params === 'undefined') {
+        console.log(this.params);
+        if ((typeof this.params === 'undefined')||(typeof this.params.scoreData === 'undefined')) {
 
         } else {
 
@@ -59,7 +60,7 @@ export default class Result extends React.Component {
             ;
 
         }
-        if (typeof this.params === 'undefined') {
+        if ((typeof this.params === 'undefined')||(typeof this.params.scoreData === 'undefined')) {
 
             return (
                 <View>
@@ -103,12 +104,14 @@ export default class Result extends React.Component {
                                    stretch
                                    onPress={next => {
                                        /** save to database **/
-                                       ref.update({
-                                            [teamId] : {
+                                       let teamId =this.state.id;
+                                       let ref1 = db.ref("/players/"+teamId);
+                                       ref1.update({
+                                            
                                                 score: this.state.score,
                                                 name: this.state.name,
                                                 scoreData: this.state.scoreData,
-                                            }
+                                            
                                        }).then((data) => {
                                            //success callback
                                            console.log('data ', data)
@@ -116,10 +119,10 @@ export default class Result extends React.Component {
                                            //error callback
                                            console.log('error ', error)
                                        });
-                                       this.props.navigation.navigate('Settings', {
+                                       this.props.navigation.navigate('Scoreboard', {
                                            user : {
-                                               id: 0, // TODO : matensech id
-                                               name: 'test',
+                                               id: this.state.id, // TODO : matensech id
+                                               name: this.state.name,
                                                score: this.state.score,
                                            }
                                        });

@@ -24,7 +24,7 @@ class Item_Component extends Component {
                         <View  key = { index }>
                             <TouchableOpacity
                                 style={styles.buttonStyle}
-                                onPress={() =>this.props.navigation.navigate('Aerochallenge',{ id:item.uid, name:item.name})}
+                                onPress={() =>this.props.navigation.navigate('Aerochallenge',{ id:index, name:item.name})}
                             >
                                 <Text style={styles.textStyle}>{item.name}</Text>
                             </TouchableOpacity>

@@ -14,7 +14,7 @@
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#eeebd2"
     },
     "updates": {
       "fallbackToCacheTimeout": 0
@@ -23,7 +23,12 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.TunisianAeroday.TunisianAeroday"
+    },
+    "android": {
+      "package": "com.TunisianAeroday.TunisianAeroday",
+      "versionCode": 1
     }
   }
 }
