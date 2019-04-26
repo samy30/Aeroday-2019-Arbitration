@@ -8,6 +8,10 @@ class MyButton extends Component {
 
     constructor(props){
         super(props);
+
+        this.state = {
+            active: false,
+        }
     }
 
     
@@ -15,17 +19,7 @@ class MyButton extends Component {
     render() {
         let { attributeName, score, content}=this.props
         return (
-            <Button
-                    color={this.state.attributeName === score?'rgba(255, 165, 0, 0.5)':'rgba(255, 165, 0, 1)'}
-                    onPress={() => {
-                    this.useNativePropsToUpdate.bind(this)
-                    /** Do Something **/
-                    this.setState(prevState => {
-                            prevState.attributeName= (prevState.attributeName==score)?0:score
-                    });
-                }}
-                  >
-                  {content}
+            <Button>
                   </Button>
         );
     }
