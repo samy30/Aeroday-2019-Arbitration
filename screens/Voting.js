@@ -1,22 +1,33 @@
 import React from 'react';
 import {ScrollView, Text, View, StyleSheet, TextInput, Dimensions} from 'react-native';
 import AwesomeButton from "react-native-really-awesome-button";
-import {Button} from "galio-framework"
+import {Button, Input} from "galio-framework"
 import SwitchSelector from "react-native-switch-selector";
 import { Timer } from 'react-native-stopwatch-timer';
 import { db } from "../config";
 import GetReadyTimer from "../components/GetReadyTimer";
 import {Slider, Icon} from 'react-native-elements';
-import moment from "moment";
+import TabBarIcon from '../components/TabBarIcon';
+import NumericInput from 'react-native-numeric-input'
+import MyButton from '../components/CustomButton'
 
 const {width, height} = Dimensions.get('window')
 
 var currentTime = 0 ;
+var b =0;
+var seconds = 0
 
 
 export default class Voting extends React.Component {
     static navigationOptions = {
         title: 'Comptage des points',
+        tabBarLabel: 'Challenge',
+        tabBarIcon: ({ focused }) => (
+        <TabBarIcon
+            focused={focused}
+            name={'md-jet'}
+        />
+      ),
     };
 
     
@@ -29,6 +40,9 @@ export default class Voting extends React.Component {
         this.state = {
             droneFabriquee: 0,
             posterTechnique: 0,
+            penaliteDiametre: 0,
+            heliceProtegee: true,
+            echecPremierEssai: false,
             quitterZoneDepart: 0,
             passerColonnes: 0,
             toursMosque: 0,
@@ -37,20 +51,20 @@ export default class Voting extends React.Component {
             stab21: 0,
             stab22: 0,
             portail: 0,
-            durée: 0,
+            duree: 0,
             collisions: 0,
             timerStart: false,
-            totalDuration: 8000,
+            totalDuration: 360000,
             timerReset: false,
             voteStarted: false,
             ready: false,
-            markedDate: moment(new Date()).format("YYYY-MM-DD")
         }
         this.toggleTimer = this.toggleTimer.bind(this);
         this.resetTimer = this.resetTimer.bind(this);
         this.handleReady = this.handleReady.bind(this);
         this.handleEndVote = this.handleEndVote.bind(this);
         this.handleTimerComplete = this.handleTimerComplete.bind(this);
+        this.getSecs = this.getSecs.bind(this);
     }
 
     
@@ -59,16 +73,39 @@ export default class Voting extends React.Component {
       this.handleEndVote();
     }
 
+    getSecs(a) {
+      b = a.split(':');
+       seconds = (+b[0]) * 60 * 60 + (+b[1]) * 60 + (+b[2]);
+       this.setState({
+         duree: 360-seconds
+       })
+    }
+
     handleReady() {
       this.setState({
         ready: true
       });
     }
-    handleEndVote(){
+    async handleEndVote(){
+
+      let teamId =this.props.navigation.state.params.id;
+        let ref1 = db.ref("/players/"+teamId);
+        ref1.update({
+                timerOn: 0,
+                //timerStart: false
+        }).then((data) => {
+            //success callback
+            console.log('data ', data)
+        }).catch((error) => {
+             //error callback
+              console.log('error ', error)
+            });
 
       this.setState({
-        timerStart: false
+       // timerStart: false
       })
+
+      await this.getSecs(currentTime)
 
       this.props.navigation.navigate('Result', {
         scoreData: {
@@ -82,7 +119,7 @@ export default class Voting extends React.Component {
             stab21: this.state.stab21,
             stab22: this.state.stab22,
             portail: this.state.portail,
-            durée: 0,
+            duree: this.state.duree,
             collisions: this.state.collisions,
         },
         id : this.params.id, 
@@ -96,10 +133,11 @@ export default class Voting extends React.Component {
     };
     componentWillUnmount() {
 
-      let teamId =this.params.id;
+      let teamId =this.props.navigation.state.params.id;
         let ref1 = db.ref("/players/"+teamId);
         ref1.update({
-                timerStart: false
+                timerOn: 0,
+                //timerStart: false
         }).then((data) => {
             //success callback
             console.log('data ', data)
@@ -111,10 +149,10 @@ export default class Voting extends React.Component {
 
     toggleTimer() {
         this.setState({timerStart: !this.state.timerStart, timerReset: false});
-        let teamId =this.params.id;
+        let teamId =this.props.navigation.state.params.id;
         let ref1 = db.ref("/players/"+teamId);
         ref1.update({
-                timerStart: !this.state.timerStart
+                timerStart: !this.state.timerStart,
         }).then((data) => {
             //success callback
             console.log('data ', data)
@@ -147,41 +185,9 @@ export default class Voting extends React.Component {
               {/*---------------------------------------*/}
               
               
-              
-              <View style={[{marginTop: 20}]}>
-
-                  <Button
-                    color={this.state.droneFabriquee === 100?'rgba(255, 165, 0, 0.5)':'rgba(255, 165, 0, 1)'}
-                    onPress={() => {
-                      let prevValue = (this.state.droneFabriquee==100)?0:100
-                      /** Do Something **/
-                    this.setState({
-                            droneFabriquee: prevValue
-                    });
-                    this.forceUpdate();
-                }}
-                  >
-                      {"Drone fabriquée par le participant"}
-                  </Button>
-                </View>
-                <View style={[{marginTop: 20}]}>
-
-                  <Button
-                    style={{marginRight: width*35/100}}
-                    color={this.state.posterTechnique === 10?'rgba(255, 165, 0, 0.5)':'rgba(255, 165, 0, 1)'}
-                    onPress={() => {
-                    /** Do Something **/
-                    let prevValue = (this.state.posterTechnique==10)?0:10
-                    this.setState({
-                      posterTechnique: prevValue
-                    });
-                }}
-                  >
-                      {"poster Technique"}
-                  </Button>
-                </View>
                 
-                <View style={[{marginTop: 20}]}>
+                
+                <View style={[{marginTop: 80}]}>
 
                   <Button
                     style={{marginRight: width*35/100}}
@@ -197,13 +203,39 @@ export default class Voting extends React.Component {
                       {"quitter la zone départ"}
                   </Button>
                 </View>
+
+                <View style={[{marginTop: 20}]}>
+                </View>
                 
+
+                <View style={[{marginTop: 20}]}>
+
+                  <Button
+                    style={{marginRight: width*35/100}}
+                    color={this.state.echecPremierEssai === false?'rgba(255, 165, 0, 0.5)':'rgba(255, 165, 0, 1)'}
+                    onPress={() => {
+                    /** Do Something **/
+                    let prevValue = (this.state.echecPremierEssai==false)?true:false
+                    this.setState({
+                      echecPremierEssai: prevValue
+                    });
+                }}
+                  >
+                      {"Echec premier essai"}
+                  </Button>
+                </View>
 
               {/*---------------------------------------*/}
 
+              
+              
+              <View 
+              style={{alignSelf: 'center',zindex:5, flexDirection: 'row',marginTop: 20}}
+              >
               <Text>Les colonnes Cartagineoises</Text>
+              </View>
               <View style={[{marginTop: 20}]}>
-
+              
                   <Button
                     style={{marginRight: width*35/100}}
                     color={this.state.passerColonnes === 2?'rgba(255, 165, 0, 0.5)':'rgba(255, 165, 0, 1)'}
@@ -292,54 +324,48 @@ export default class Voting extends React.Component {
 
                 <Text>Les Bassins Aglabides</Text>
                 <Text>Le premier bassin </Text>
-                <Text>Hauteur 1 </Text>
-                <View style={{ flex: 1, justifyContent: 'center', width: 250, height: 40 }}>
-                <Slider
-                    maximumValue= {5}
-                    minimumValue= {0}
-                    step= {0.5}
-                    value={this.state.stab11}
-                    
-                    onValueChange={value => this.setState({ stab11: value,  stab12: 0 })}
-                    />
-                  <Text>Value: {this.state.stab11}</Text>
+                <View style={[{marginTop: 20}, styles.container]}>
+                    <Text style={styles.text}>Hauteur 1 :</Text>
+                    <View style={[{
+                        flexDirection: 'row',
+                        justifyContent: 'flex-end',
+                        alignItems: 'flex-start',
+                    }]}>
+                        <NumericInput rounded minValue={0} maxValue={10} value={this.state.stab11} onChange={(val) =>{this.setState({stab11: val});console.log(this.state.stab11)}}/>
+                    </View>
                 </View>
-                <Text>Hauteur 2 </Text>
-                <View style={{ flex: 1, justifyContent: 'center', width: 250, height: 40 }}>
-                <Slider
-                    maximumValue= {5}
-                    minimumValue= {0}
-                    step= {0.5}
-                    value={this.state.stab12}
-                    
-                    onValueChange={value => this.setState({ stab12: value, stab11: 0 })}
-                    />
-                  <Text>Value: {this.state.stab12}</Text>
+                <View style={[{marginTop: 20}, styles.container]}>
+                    <Text style={styles.text}>Hauteur 2 :</Text>
+                    <View style={[{
+                        flexDirection: 'row',
+                        justifyContent: 'flex-end',
+                        alignItems: 'flex-start',
+                    }]}>
+                        <NumericInput rounded minValue={0} maxValue={10} value={this.state.stab12} onChange={(val) =>{this.setState({stab12: val});console.log(this.state.stab12)}}/>
+                    </View>
                 </View>
                 <Text>Le deuxiéme bassin</Text>
-                <Text>Hauteur 1 </Text>
-                <View style={{ flex: 1, justifyContent: 'center', width: 250, height: 40 }}>
-                <Slider
-                    maximumValue= {5}
-                    minimumValue= {0}
-                    step= {0.5}
-                    value={this.state.stab21}
-                    
-                    onValueChange={value => this.setState({ stab21: value, stab22: 0})}
-                    />
-                  <Text>Value: {this.state.stab21}</Text>
+                <View style={[{marginTop: 20}, styles.container]}>
+                    <Text style={styles.text}>Hauteur 1 :</Text>
+                    <View style={[{
+                        flexDirection: 'row',
+                        justifyContent: 'flex-end',
+                        alignItems: 'flex-start',
+                    }]}>
+                        <NumericInput rounded minValue={0} maxValue={10} value={this.state.stab21} onChange={(val) =>{this.setState({stab21: val});console.log(this.state.stab21)}}/>
+                    </View>
                 </View>
-                <Text>Hauteur 2 </Text>
-                <View style={{ flex: 1, justifyContent: 'center', width: 250, height: 40 }}>
-                <Slider
-                    maximumValue= {5}
-                    minimumValue= {0}
-                    step= {0.5}
-                    value={this.state.stab22}
-                    
-                    onValueChange={value => this.setState({ stab22: value, stab21: 0 })}
-                    />
-                  <Text>Value: {this.state.stab22}</Text>
+                
+                
+                <View style={[{marginTop: 20}, styles.container]}>
+                    <Text style={styles.text}>Hauteur 2 :</Text>
+                    <View style={[{
+                        flexDirection: 'row',
+                        justifyContent: 'flex-end',
+                        alignItems: 'flex-start',
+                    }]}>
+                        <NumericInput rounded minValue={0} maxValue={7} value={this.state.stab22} onChange={(val) =>{this.setState({stab22: val});console.log(this.state.stab22)}}/>
+                    </View>
                 </View>
 
                 {/*---------------------------------------*/}
@@ -419,11 +445,9 @@ export default class Voting extends React.Component {
                 type='font-awesome'
                color='#f50'
                 onPress={() =>{ 
-                  console.log(this.state.markedDate)
-                  this.setState({
-                  timerStart: !this.state.timerStart
-                })}
-                } />
+                  console.log(this.getSecs(currentTime))
+                  this.toggleTimer()
+                }} />
               
                 <Icon
                 raised
@@ -456,7 +480,7 @@ export default class Voting extends React.Component {
                                       console.log(this.state.collisions)
                                       this.forceUpdate();
                                       next();
-                                       }
+                                       } 
                                       }
                         >
                             {this.state.collisions+' Collision ' }
@@ -496,6 +520,17 @@ export default class Voting extends React.Component {
 
       render(){
 
+        this.params = this.props.navigation.state.params;
+        console.log(this.params);
+        if ((typeof this.params === 'undefined')||(typeof this.params.scoreData === 'undefined')) {
+
+        } else {
+
+            this.setState ({
+                id: this.params.id,
+            });
+          }
+
         let { ready, timerOff } = this.state;
     return (
       <View style={styles.startContainer}>
@@ -515,17 +550,29 @@ export default class Voting extends React.Component {
                             backgroundColor={'#FFA500'}
                             progressLoadingTime={1000}
                             onPress={ next => {
-                              
+                              let teamId =this.props.navigation.state.params.id;
+                              let ref1 = db.ref("/players/"+teamId);
+                              ref1.update({
+                                timerOn: 1,
+                                timerStart: true,
+                              }).then((data) => {
+            //success callback
+                              console.log('data ', data)
+                                }).catch((error) => {
+             //error callback
+                              console.log('error ', error)
+                                 });
                              this.setState({
                                //timerStart : !this.state.timerStart,
-                               voteStarted: true
+                               //timerStart: true,
+                               voteStarted: true,
                              })
                            
                            next();
                             }
                            }
              >
-       {"quitter la zone départ"}
+       {"Commencer l'arbitrage"}
        </AwesomeButton>
         
  </View>

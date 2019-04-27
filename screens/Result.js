@@ -3,12 +3,20 @@ import {ScrollView, StyleSheet, Text, View, YellowBox} from 'react-native';
 import {DataTable} from "react-native-paper";
 import AwesomeButton from "react-native-really-awesome-button";
 import { db } from "../config";
+import TabBarIcon from '../components/TabBarIcon';
 
 let ref = db.ref("/players/");
 
 export default class Result extends React.Component {
     static navigationOptions = {
         title: 'Resultat',
+        tabBarLabel: 'Resultat',
+        tabBarIcon: ({ focused }) => (
+        <TabBarIcon
+            focused={focused}
+             name={'md-clipboard'}
+        />
+        ),
     };
 
 
@@ -43,6 +51,8 @@ export default class Result extends React.Component {
                 score: 0
             };
 
+            scoreDuree= (this.params.scoreData.duree <= 180)?36:(36- Math.round((this.params.scoreData.duree-180)/5)) 
+
             this.state.score =
                 this.params.scoreData.droneFabriquee
                 +
@@ -54,7 +64,17 @@ export default class Result extends React.Component {
                 +
                 this.params.scoreData.toursMosque*15
                 +
-                this.params.scoreData.portail 
+                this.params.scoreData.stab11*8
+                +
+                this.params.scoreData.stab12*4
+                +
+                this.params.scoreData.stab21*5
+                +
+                this.params.scoreData.stab22*4
+                +
+                this.params.scoreData.portail
+                +
+                scoreDuree
                 -
                 this.params.scoreData.collisions
             ;
@@ -89,7 +109,10 @@ export default class Result extends React.Component {
                         <this.Row label={"Passer Entre Les Colonnes Carthagiénes"} value={this.state.scoreData.passerColonnes*15}/>
                         <this.Row label={"Effectuer Tour autours du minaret du Mosque"} value={this.state.scoreData.toursMosque*15}/>
                         <this.Row label={"Traverser Les portails De La Muraille Du Sfax"} value={this.state.scoreData.portail}/>
+                        <this.Row label={"Stabilisation sur le bassin 1"} value={this.state.scoreData.stab11*8 +this.state.scoreData.stab12*4}/>
+                        <this.Row label={"Stabilisation sur le bassin 2"} value={this.state.scoreData.stab21*5 +this.state.scoreData.stab22*4}/>
                         <this.Row label={"collisions"} value={this.state.scoreData.collisions*-1}/>
+                        <this.Row label={"durée"} value={scoreDuree}/>
                         <this.Row label={"score"} value={this.state.score}/>
                     </DataTable>
                     <View style={{

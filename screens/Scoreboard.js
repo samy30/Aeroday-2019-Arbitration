@@ -4,6 +4,7 @@ import Leaderboard from 'react-native-leaderboard';
 import firebase from 'firebase'
 import {StyleSheet, ActivityIndicator, View, Text,Button} from 'react-native';
 import {Alert, YellowBox} from 'react-native';
+import TabBarIcon from '../components/TabBarIcon';
 
 
 
@@ -12,6 +13,13 @@ export default class Scoreboard extends Component {
 
     static navigationOptions = {
         header: null,
+        tabBarLabel: 'Standing',
+            tabBarIcon: ({ focused }) => (
+            <TabBarIcon
+            focused={focused}
+             name={'md-trophy'}
+            />
+        ),
     };
 
     constructor(props, context, state) {
