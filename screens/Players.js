@@ -25,9 +25,9 @@ class Players extends React.Component {
         BackHandler.addEventListener('hardwareBackPress', this.handleBackPress);
     }
 
-    componentWillMount(){
+   async componentWillMount(){
         this.setState({isLoading:true} );
-        ref.once('value').then(snapshot => {
+        await ref.once('value').then(snapshot => {
             var data = snapshot.val();
             var items = Object.values(data);
             this.setState({valueArray:items,

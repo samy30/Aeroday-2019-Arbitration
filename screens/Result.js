@@ -5,6 +5,9 @@ import AwesomeButton from "react-native-really-awesome-button";
 import { db } from "../config";
 import TabBarIcon from '../components/TabBarIcon';
 
+import Toast, {DURATION} from 'react-native-easy-toast';
+
+
 let ref = db.ref("/players/");
 
 export default class Result extends React.Component {
@@ -51,16 +54,24 @@ export default class Result extends React.Component {
                 score: 0
             };
 
-            scoreDuree= (this.params.scoreData.duree <= 180)?36:(36- Math.round((this.params.scoreData.duree-180)/5)) 
+            scoreColonnes = (this.params.scoreData.passerColonnes === 3)?30:(this.params.scoreData.passerColonnes === 2)?15:0;
+            scoreDuree= (this.params.scoreData.duree === 0 ?0:(this.params.scoreData.duree <= 180)?36:(36- Math.round((this.params.scoreData.duree-180)/5))) 
 
             this.state.score =
+                -
+                this.params.scoreData.echecPremierEssai
+                -
+                this.params.scoreData.heliceProtegee
+                -
+                this.params.scoreData.penaliteDiametre
+                +
                 this.params.scoreData.droneFabriquee
                 +
                 this.params.scoreData.posterTechnique
                 +
                 this.params.scoreData.quitterZoneDepart
                 +
-                this.params.scoreData.passerColonnes*15
+                scoreColonnes
                 +
                 this.params.scoreData.toursMosque*15
                 +
@@ -105,8 +116,12 @@ export default class Result extends React.Component {
                         </DataTable.Header>
                         <this.Row label={"Drone Fabriquée Par Le Participant"} value={this.state.scoreData.droneFabriquee}/>
                         <this.Row label={"Poster Technique"} value={this.state.scoreData.posterTechnique}/>
+                        <this.Row label={"Penalité Diametre"} value={this.state.scoreData.penaliteDiametre*-1}/>
+                        <this.Row label={"protection helice"} value={this.state.scoreData.heliceProtegee*-1}/>
+                        <this.Row label={"echec premier essai"} value={this.state.scoreData.echecPremierEssai*-1}/>
+
                         <this.Row label={"Quitter La Zone Départ"} value={this.state.scoreData.quitterZoneDepart}/>
-                        <this.Row label={"Passer Entre Les Colonnes Carthagiénes"} value={this.state.scoreData.passerColonnes*15}/>
+                        <this.Row label={"Passer Entre Les Colonnes Carthagiénes"} value={scoreColonnes}/>
                         <this.Row label={"Effectuer Tour autours du minaret du Mosque"} value={this.state.scoreData.toursMosque*15}/>
                         <this.Row label={"Traverser Les portails De La Muraille Du Sfax"} value={this.state.scoreData.portail}/>
                         <this.Row label={"Stabilisation sur le bassin 1"} value={this.state.scoreData.stab11*8 +this.state.scoreData.stab12*4}/>
@@ -126,35 +141,47 @@ export default class Result extends React.Component {
                                    backgroundColor={'#0069D9'}
                                    stretch
                                    onPress={next => {
+
+                                    let teamId =this.props.navigation.state.params.id;
+                                    let ref1 = db.ref("/players");
+                              
+                                    ref1.once('value').then(snapshot => {
+                                        players = snapshot.val();
+                                        teamId=players.indexOf(players.filter(c => c.uid === teamId)[0])
+                                        ref2 = db.ref("/players/"+teamId)
+                                        ref2.update({
+                                            score: this.state.score,
+                                            name: this.state.name,
+                                            scoreData: this.state.scoreData,
+                                
+                                            }).then((data) => {
+                                                //this.refs.toast.show("Score enregistré!");
+                                                
+                            //success callback
+                            //console.log('data ', data)
+                                            }).catch((error) => {
+                             //error callback
+                              //console.log('error ', error)
+                                         });
+                                         });
                                        /** save to database **/
-                                       let teamId =this.state.id;
-                                       let ref1 = db.ref("/players/"+teamId);
-                                       ref1.update({
-                                            
-                                                score: this.state.score,
-                                                name: this.state.name,
-                                                scoreData: this.state.scoreData,
-                                            
-                                       }).then((data) => {
-                                           //success callback
-                                           console.log('data ', data)
-                                       }).catch((error) => {
-                                           //error callback
-                                           console.log('error ', error)
-                                       });
-                                       this.props.navigation.navigate('Scoreboard', {
+                                        alert("Score enregistré")
+                                       this.refs.toast.show("Score enregistré!");
+                                       /*this.props.navigation.navigate('Scoreboard', {
                                            user : {
                                                id: this.state.id, // TODO : matensech id
                                                name: this.state.name,
                                                score: this.state.score,
                                            }
-                                       });
+                                       });*/
                                        next();
                                    }}
                     >
                         Save
                     </AwesomeButton>
+                    <Toast opacity={0.7} ref="toast"/>
                     </View>
+                    
                 </ScrollView>
             );
         }

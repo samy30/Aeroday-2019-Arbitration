@@ -10,8 +10,12 @@ import {Slider, Icon} from 'react-native-elements';
 import TabBarIcon from '../components/TabBarIcon';
 import NumericInput from 'react-native-numeric-input'
 import MyButton from '../components/CustomButton'
+import CountDown from 'react-native-countdown-component';
+
 
 const {width, height} = Dimensions.get('window')
+
+var players =0;
 
 var currentTime = 0 ;
 var b =0;
@@ -41,8 +45,8 @@ export default class Voting extends React.Component {
             droneFabriquee: 0,
             posterTechnique: 0,
             penaliteDiametre: 0,
-            heliceProtegee: true,
-            echecPremierEssai: false,
+            heliceProtegee: 0,
+            echecPremierEssai: 0,
             quitterZoneDepart: 0,
             passerColonnes: 0,
             toursMosque: 0,
@@ -81,34 +85,102 @@ export default class Voting extends React.Component {
        })
     }
 
+    handleTime = (langValue) => {
+      this.setState({
+        duree : 360-langValue
+      })
+    }
+
     handleReady() {
       this.setState({
         ready: true
       });
     }
-    async handleEndVote(){
+
+    async handleEndVote2(){
+      
 
       let teamId =this.props.navigation.state.params.id;
-        let ref1 = db.ref("/players/"+teamId);
-        ref1.update({
-                timerOn: 0,
-                //timerStart: false
-        }).then((data) => {
-            //success callback
-            console.log('data ', data)
-        }).catch((error) => {
-             //error callback
-              console.log('error ', error)
-            });
+                              let ref1 = db.ref("/players");
+                              
+                              ref1.once('value').then(snapshot => {
+                                players = snapshot.val();
+                                teamId=players.indexOf(players.filter(c => c.uid === teamId)[0])
+                                ref2 = db.ref("/players/"+teamId)
+                              ref2.update({
+                                timerStart: false,
+                                timerOn: 0,
+                                
+                               }).then((data) => {
+                            //success callback
+                            //console.log('data ', data)
+                                }).catch((error) => {
+                             //error callback
+                              //console.log('error ', error)
+                            });
+                              });
 
-      this.setState({
-       // timerStart: false
-      })
 
-      await this.getSecs(currentTime)
+
+      //await this.getSecs(currentTime)
 
       this.props.navigation.navigate('Result', {
         scoreData: {
+            penaliteDiametre: this.state.penaliteDiametre,
+            heliceProtegee: this.state.heliceProtegee,
+            echecPremierEssai: this.state.echecPremierEssai,
+            droneFabriquee: this.state.droneFabriquee,
+            posterTechnique: this.state.posterTechnique,
+            quitterZoneDepart: this.state.quitterZoneDepart,
+            passerColonnes: this.state.passerColonnes,
+            toursMosque: this.state.toursMosque,
+            stab11: this.state.stab11,
+            stab12: this.state.stab12,
+            stab21: this.state.stab21,
+            stab22: this.state.stab22,
+            portail: this.state.portail,
+            duree: 0,
+            collisions: this.state.collisions,
+        },
+        id : this.params.id, 
+        name: this.params.name 
+        });
+
+    }
+
+
+    async handleEndVote(){
+      
+
+      let teamId =this.props.navigation.state.params.id;
+                              let ref1 = db.ref("/players");
+                              
+                              ref1.once('value').then(snapshot => {
+                                players = snapshot.val();
+                                teamId=players.indexOf(players.filter(c => c.uid === teamId)[0])
+                                ref2 = db.ref("/players/"+teamId)
+                              ref2.update({
+                                timerStart: false,
+                                timerOn: 0,
+                                
+                               }).then((data) => {
+                            //success callback
+                            //console.log('data ', data)
+                                }).catch((error) => {
+                             //error callback
+                              //console.log('error ', error)
+                            });
+                              });
+
+
+
+      //await this.getSecs(currentTime)
+
+      this.props.navigation.navigate('Result', {
+        scoreData: {
+            penaliteDiametre: this.state.penaliteDiametre,
+            heliceProtegee: this.state.heliceProtegee,
+            echecPremierEssai: this.state.echecPremierEssai,
             droneFabriquee: this.state.droneFabriquee,
             posterTechnique: this.state.posterTechnique,
             quitterZoneDepart: this.state.quitterZoneDepart,
@@ -132,19 +204,25 @@ export default class Voting extends React.Component {
         currentTime = time;
     };
     componentWillUnmount() {
-
       let teamId =this.props.navigation.state.params.id;
-        let ref1 = db.ref("/players/"+teamId);
-        ref1.update({
-                timerOn: 0,
-                //timerStart: false
-        }).then((data) => {
-            //success callback
-            console.log('data ', data)
-        }).catch((error) => {
-             //error callback
-              console.log('error ', error)
-            });
+                              let ref1 = db.ref("/players");
+                              
+                              ref1.once('value').then(snapshot => {
+                                players = snapshot.val();
+                                teamId=players.indexOf(players.filter(c => c.uid === teamId)[0])
+                                ref2 = db.ref("/players/"+teamId)
+                              ref2.update({
+                                timerStart: false,
+                                timerOn: 0,
+                                
+                               }).then((data) => {
+                            //success callback
+                            //console.log('data ', data)
+                                }).catch((error) => {
+                             //error callback
+                              //console.log('error ', error)
+                            });
+                              });
   }
 
     toggleTimer() {
@@ -155,10 +233,10 @@ export default class Voting extends React.Component {
                 timerStart: !this.state.timerStart,
         }).then((data) => {
             //success callback
-            console.log('data ', data)
+            //console.log('data ', data)
         }).catch((error) => {
              //error callback
-              console.log('error ', error)
+              //console.log('error ', error)
             });
       }
      
@@ -212,10 +290,10 @@ export default class Voting extends React.Component {
 
                   <Button
                     style={{marginRight: width*35/100}}
-                    color={this.state.echecPremierEssai === false?'rgba(255, 165, 0, 0.5)':'rgba(255, 165, 0, 1)'}
+                    color={this.state.echecPremierEssai === 3?'rgba(255, 165, 0, 0.5)':'rgba(255, 165, 0, 1)'}
                     onPress={() => {
                     /** Do Something **/
-                    let prevValue = (this.state.echecPremierEssai==false)?true:false
+                    let prevValue = (this.state.echecPremierEssai==3)?0:3
                     this.setState({
                       echecPremierEssai: prevValue
                     });
@@ -325,46 +403,74 @@ export default class Voting extends React.Component {
                 <Text>Les Bassins Aglabides</Text>
                 <Text>Le premier bassin </Text>
                 <View style={[{marginTop: 20}, styles.container]}>
-                    <Text style={styles.text}>Hauteur 1 :</Text>
+                    <Text style={styles.text}>Hauteur 1 :{this.state.stab11}</Text>
                     <View style={[{
                         flexDirection: 'row',
                         justifyContent: 'flex-end',
                         alignItems: 'flex-start',
                     }]}>
-                        <NumericInput rounded minValue={0} maxValue={10} value={this.state.stab11} onChange={(val) =>{this.setState({stab11: val});console.log(this.state.stab11)}}/>
+                    <Slider
+                    style={{width: 200, height: 40}}
+                    minimumValue={0}
+                     maximumValue={7}
+                     step={0.5}
+                     value={this.state.stab11}
+                      onValueChange={value => this.setState({ stab11: value, stab12:0, stab21:0,stab22:0 })}
+                     />
                     </View>
                 </View>
                 <View style={[{marginTop: 20}, styles.container]}>
-                    <Text style={styles.text}>Hauteur 2 :</Text>
+                    <Text style={styles.text}>Hauteur 2 :{this.state.stab12}</Text>
                     <View style={[{
                         flexDirection: 'row',
                         justifyContent: 'flex-end',
                         alignItems: 'flex-start',
                     }]}>
-                        <NumericInput rounded minValue={0} maxValue={10} value={this.state.stab12} onChange={(val) =>{this.setState({stab12: val});console.log(this.state.stab12)}}/>
+                    <Slider
+                    style={{width: 200, height: 40}}
+                    minimumValue={0}
+                     maximumValue={7}
+                     step={0.5}
+                     value={this.state.stab12}
+                      onValueChange={value => this.setState({ stab12: value,stab11:0, stab21:0,stab22:0 })}
+                     />
                     </View>
                 </View>
                 <Text>Le deuxiéme bassin</Text>
                 <View style={[{marginTop: 20}, styles.container]}>
-                    <Text style={styles.text}>Hauteur 1 :</Text>
+                    <Text style={styles.text}>Hauteur 1 :{this.state.stab21}</Text>
                     <View style={[{
                         flexDirection: 'row',
                         justifyContent: 'flex-end',
                         alignItems: 'flex-start',
                     }]}>
-                        <NumericInput rounded minValue={0} maxValue={10} value={this.state.stab21} onChange={(val) =>{this.setState({stab21: val});console.log(this.state.stab21)}}/>
+                    <Slider
+                    style={{width: 200, height: 40}}
+                    minimumValue={0}
+                     maximumValue={7}
+                     step={0.5}
+                     value={this.state.stab21}
+                      onValueChange={value => this.setState({ stab21: value, stab11:0, stab12:0, stab22:0 })}
+                     />
                     </View>
                 </View>
                 
                 
                 <View style={[{marginTop: 20}, styles.container]}>
-                    <Text style={styles.text}>Hauteur 2 :</Text>
+                    <Text style={styles.text}>Hauteur 2 :{this.state.stab22}</Text>
                     <View style={[{
                         flexDirection: 'row',
                         justifyContent: 'flex-end',
                         alignItems: 'flex-start',
                     }]}>
-                        <NumericInput rounded minValue={0} maxValue={7} value={this.state.stab22} onChange={(val) =>{this.setState({stab22: val});console.log(this.state.stab22)}}/>
+                    <Slider
+                    style={{width: 200, height: 40}}
+                    minimumValue={0}
+                     maximumValue={7}
+                     step={0.5}
+                     value={this.state.stab22}
+                      onValueChange={value => this.setState({ stab22: value, stab11:0,stab12:0,stab21:0 })}
+                     />
                     </View>
                 </View>
 
@@ -429,32 +535,25 @@ export default class Voting extends React.Component {
             width={100}
             position="absolute"
             style={{alignSelf: 'flex-start',zindex:5}}>
-                  <Timer totalDuration={this.state.totalDuration} start={this.state.timerStart}
-                    reset={this.state.timerReset}
-                    options={options}
-                    handleFinish={this.handleTimerComplete}
-                    getTime={this.getFormattedTime} />
+                  <CountDown
+              until={360}
+              timeToShow={['M', 'S']}
+              onFinish={() => this.handleEndVote2()}
+              size={20}
+              onTimeChange={this.handleTime}
+            />
               </View>
               <View 
               position="absolute"
               style={{alignSelf: 'center',zindex:5, flexDirection: 'row'}}>
-              <Icon
-               
-                raised
-                name= {!this.state.timerStart?'play':'pause'}
-                type='font-awesome'
-               color='#f50'
-                onPress={() =>{ 
-                  console.log(this.getSecs(currentTime))
-                  this.toggleTimer()
-                }} />
+              
               
                 <Icon
                 raised
                 name='stop'
                 type='font-awesome'
                color='#f50'
-                onPress={() => this.handleEndVote()} />
+                onPress={() => this.handleEndVote2()} />
               
                 
                 </View>
@@ -477,7 +576,6 @@ export default class Voting extends React.Component {
                                         this.setState(prev => {
                                             return { collisions:prev.collisions+1}
                                         })
-                                      console.log(this.state.collisions)
                                       this.forceUpdate();
                                       next();
                                        } 
@@ -521,7 +619,6 @@ export default class Voting extends React.Component {
       render(){
 
         this.params = this.props.navigation.state.params;
-        console.log(this.params);
         if ((typeof this.params === 'undefined')||(typeof this.params.scoreData === 'undefined')) {
 
         } else {
@@ -551,17 +648,38 @@ export default class Voting extends React.Component {
                             progressLoadingTime={1000}
                             onPress={ next => {
                               let teamId =this.props.navigation.state.params.id;
-                              let ref1 = db.ref("/players/"+teamId);
-                              ref1.update({
-                                timerOn: 1,
+                              let ref1 = db.ref("/players");
+                              
+                              ref1.once('value').then(snapshot => {
+                                players = snapshot.val();
+                                teamId=players.indexOf(players.filter(c => c.uid === teamId)[0])
+
+                                ref2 = db.ref("/players/"+teamId)
+                                ref2.once('value').then(snapshot=>{
+
+                                  player=snapshot.val();
+                                  this.setState({
+                                    droneFabriquee: player.scoreData.droneFabriquee,
+                                    posterTechnique: player.scoreData.posterTechnique,
+                                    penaliteDiametre: player.scoreData.penaliteDiametre,
+                                    heliceProtegee: player.scoreData.heliceProtegee,
+                                  })
+                                })
+                              ref2.update({
                                 timerStart: true,
-                              }).then((data) => {
-            //success callback
-                              console.log('data ', data)
+                                timerOn: 1,
+                                
+                               }).then((data) => {
+                            //success callback
+                            //console.log('data ', data)
                                 }).catch((error) => {
-             //error callback
-                              console.log('error ', error)
-                                 });
+                             //error callback
+                              //console.log('error ', error)
+                            });
+                              });
+                              
+                              
+                              
                              this.setState({
                                //timerStart : !this.state.timerStart,
                                //timerStart: true,

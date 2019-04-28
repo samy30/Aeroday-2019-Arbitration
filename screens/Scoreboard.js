@@ -48,7 +48,7 @@ export default class Scoreboard extends Component {
         const ref = firebase.database().ref('players');
 
         ref.on('value', snapshot => {
-          console.log(snapshot.val())
+          //console.log(snapshot.val())
             this.setState({
                 globalData: snapshot.val(),
                 isLoading: false
